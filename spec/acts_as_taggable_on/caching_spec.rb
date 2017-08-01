@@ -81,6 +81,13 @@ describe 'Acts As Taggable On' do
       ColumnsOverrideModel.acts_as_taggable
       expect(ColumnsOverrideModel.columns.map(&:name)).not_to include('ignored_column')
     end
+
+    it 'should not make a database query when retrieving the tag list' do
+      @taggable.update_attributes(tag_list: 'awesome, epic')
+      @taggable = CachedModel.find(@taggable.id)
+      expect(ActiveRecord::Base).not_to receive(:connection)
+      @taggable.tag_list
+    end
   end
 
   describe 'with a custom delimiter' do
